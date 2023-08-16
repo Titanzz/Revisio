@@ -23,6 +23,8 @@ def on_resize(event):
 root.bind("<Configure>", on_resize)
 
 decks = []
+flashcards_dict = {}
+
 
 def addDeck(inp):
     name = inp.get()
@@ -45,8 +47,6 @@ def viewDecks():
         deck_label = tk.Label(new_window, text=deck_name)
         deck_label.grid(row=i, column=0)
 
-
- 
 def close(window):
     window.destroy()
 
@@ -62,21 +62,16 @@ def createNewDeck():
 
 def createCards():
     menu_window = tk.Toplevel()
-    menu_window.geometry("250x250")
-    menu_window.grid_rowconfigure(0, weight=1)
-    menu_window.grid_rowconfigure(1, weight=1)
-    menu_window.grid_rowconfigure(2, weight=1)
-    menu_window.grid_rowconfigure(3, weight=1)
-    menu_window.grid_rowconfigure(4, weight=1)
+    menu_window.geometry("400x400")
     menu_window.grid_columnconfigure(0, weight=1)
 
-    flashcard_front_heading = tk.Label(menu_window, text="Flashcard Front", font=('Arial', 12, 'bold'))
+    flashcard_front_heading = tk.Label(menu_window, text="Flashcard Front", font=('Arial', 30, 'bold'))
     flashcard_front_heading.grid(row=0, column=0,)
     global flashcard_front_input
     flashcard_front_input = tk.Entry(menu_window)
     flashcard_front_input.grid(row=1, column=0)
 
-    flashcard_back_heading = tk.Label(menu_window, text="Flashcard Back", font=('Arial', 12, 'bold'))
+    flashcard_back_heading = tk.Label(menu_window, text="Flashcard Back", font=('Arial', 30, 'bold'))
     flashcard_back_heading.grid(row=2, column=0, )
     global flashcard_back_input
     flashcard_back_input = tk.Entry(menu_window)
@@ -105,13 +100,13 @@ def add_flashcard():
     front_text = flashcard_front_input.get()
     back_text = flashcard_back_input.get()
     selected_deck = deck_dropdown.get()
-
     flashcard_front_input.delete(0, tk.END)
     flashcard_back_input.delete(0, tk.END)
 
-    print("Flashcard Front:", front_text)
-    print("Flashcard Back:", back_text)
-    print("Selected Deck:", selected_deck)
+    if selected_deck not in flashcards_dict:
+        flashcards_dict[selected_deck] = []
+    flashcards_dict[selected_deck].append({"front": front_text, "back": back_text})
+    print(flashcards_dict)
 
 deckTitle = ttk.Label(root,text = "Main Menu",foreground = "black",font=('Nexa', 40))
 deckTitle.grid(row=0, column=0, columnspan=3, pady=20)
