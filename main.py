@@ -6,11 +6,12 @@ root = tk.Tk()
 root.title("Revisio")
 root.geometry("500x500")
 
+
 decks = []
 
 def addDeck(inp):
     name = inp.get()
-    decks.append([name, 0])
+    decks.append([name])
     print(decks)
     
 def viewDecks():
@@ -26,13 +27,10 @@ def viewDecks():
 
     for i, deck_info in enumerate(decks, start=1):
         deck_name = deck_info[0]
-        num_cards = deck_info[1]
-
         deck_label = tk.Label(new_window, text=deck_name)
         deck_label.grid(row=i, column=0)
 
-        num_cards_label = tk.Label(new_window, text=num_cards)
-        num_cards_label.grid(row=i, column=1)
+
  
 def close(window):
     window.destroy()
@@ -65,13 +63,20 @@ def createCards():
     deck_label.grid(row=5, column=0, sticky="w")
     global deck_dropdown
     deck_dropdown = tk.StringVar(menu_window)
-    deck_dropdown.set(decks[0][0])
-    deck_menu = tk.OptionMenu(menu_window, deck_dropdown, *decks)
-    deck_menu.grid(row=6, column=0, padx=10, pady=5)
-    
+    try:
+        deck_dropdown.set(decks[0][0])
+        deck_menu = tk.OptionMenu(menu_window, deck_dropdown, *decks)
+        deck_menu.grid(row=6, column=0, padx=10, pady=5)
+        add_flashcard_button = tk.Button(menu_window, text="Add Flashcard", command=add_flashcard)
+        add_flashcard_button.grid(row=4, column=0, padx=10, pady=10)
+    except:
+            error = tk.Toplevel()
+            error.geometry("250x100")
+            error.title("Error message")
+            errormsg = tk.Label(error, text="Error, no decks to add flashcards into.").grid(padx=20, pady=20)
+            menu_window.destroy()
 
-    add_flashcard_button = tk.Button(menu_window, text="Add Flashcard", command=add_flashcard)
-    add_flashcard_button.grid(row=4, column=0, padx=10, pady=10)
+
 
 
 def add_flashcard():
@@ -95,9 +100,9 @@ deckTitle.grid(row=0, column=2,padx=5, pady=5)
 newDeck = ttk.Button(root,text="New deck",command = createNewDeck)
 viewDeck = ttk.Button(root,text="View decks",command = viewDecks)
 createCard = ttk.Button(root,text="Create cards",command = createCards)
-viewDeck.grid(row=1, column=3, padx=5, pady=1)
-newDeck.grid(row=1, column=1, padx=5, pady=1)
-createCard.grid(row=1, column = 2, padx=5, pady=1)
+viewDeck.grid(row=1, column=3, padx=5, pady=1, sticky='nsew')
+newDeck.grid(row=1, column=1, padx=5, pady=1, sticky='nsew')
+createCard.grid(row=1, column = 2, padx=5, pady=1, sticky='nsew')
 
 root.mainloop()
 
