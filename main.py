@@ -5,25 +5,24 @@ from tkinter import simpledialog
 root = tk.Tk()
 root.title("Revisio")
 root.geometry("600x600")
+root.configure(bg="gray")
 root.columnconfigure(0, weight=1)
 root.columnconfigure(1, weight=1)
 root.columnconfigure(2, weight=1)
 
-def on_resize(event):
-    new_width = event.width
-    new_height = event.height
-    
-    for widget in root.winfo_children():
-        if isinstance(widget, tk.Button):
-            button_width = new_width // 6
-            button_height = new_height // 20
-            widget.config(width=button_width, height=button_height, font=("Helvetica", 10))
-        elif isinstance(widget, tk.Label) and widget == heading_label:
-            widget.config(font=("Helvetica", 20))
-root.bind("<Configure>", on_resize)
+def open_settings():
+    settings_window = tk.Toplevel(root)
+    settings_window.title("Settings")
+
+toolbar_frame = tk.Frame(root, bg="gray")
+toolbar_frame.grid(row=0, column=0, columnspan=3, sticky="ew")
+settings_button = ttk.Button(toolbar_frame, text="Settings", command=open_settings)
+settings_button.grid(row=0, column=2, padx=10, pady=5)
+
 
 decks = []
 flashcards_dict = {}
+
 
 def addDeck(inp):
     name = inp.get("1.0", "end-1c")
@@ -116,19 +115,94 @@ def add_flashcard():
     print(flashcards_dict)
 
 def reviewCards():
-    pass
+    global learn_flashcards_window, easy_button, good_button, hard_button
+    learn_flashcards_window = tk.Toplevel(root)
+    learn_flashcards_window.title("Learn Flashcards")
+    learn_flashcards_window.geometry("600x600")
+    learn_flashcards_window.grid_rowconfigure(0, weight=1)
+    learn_flashcards_window.grid_rowconfigure(1, weight=1)
+    learn_flashcards_window.grid_rowconfigure(2, weight=1)
+    learn_flashcards_window.grid_rowconfigure(3, weight=1)
+    learn_flashcards_window.grid_columnconfigure(0, weight=1)
+    learn_flashcards_window.grid_columnconfigure(1, weight=1)
 
-deckTitle = ttk.Label(root,text = "Main Menu",foreground = "black",font=('Nexa', 40))
-deckTitle.grid(row=0, column=0, columnspan=3, pady=20)
+    deck_label = tk.Label(learn_flashcards_window, text="Review Flashcards", font=('Arial', 20, 'bold'))
+    deck_label.grid(row=0, column=0, columnspan=4, pady=5)
+
+    deck_dropdown = tk.StringVar(learn_flashcards_window)
+    deck_dropdown.set(decks[0][0])
+    deck_menu = tk.OptionMenu(learn_flashcards_window, deck_dropdown, *decks)
+    deck_menu.grid(row=1, column=0, columnspan=2, pady=5)
+
+    select_deck_button = tk.Button(learn_flashcards_window, font=('Arial', 15), text="Select Deck",command=lambda: select_deck(deck_dropdown.get()))
+    select_deck_button.grid(row=1, column=1, columnspan=4, pady=5)
+
+    global easy_button, good_button, hard_button
+    easy_button = tk.Button(learn_flashcards_window, text="Easy", font=('Arial', 15), command=lambda: rate_flashcard("Easy"), bg="green")
+    good_button = tk.Button(learn_flashcards_window, text="Good", font=('Arial', 15), command=lambda: rate_flashcard("Good"), bg="yellow")
+    hard_button = tk.Button(learn_flashcards_window, text="Hard", font=('Arial', 15), command=lambda: rate_flashcard("Hard"), bg="red")
+
+    flip_button = tk.Button(learn_flashcards_window, text="Flip", font=('Arial', 15), command=flip_flashcard)
+    flip_button.grid(row=2, column=0, padx=10, pady=20)
+
+    global flashcard_text
+    flashcard_text = tk.StringVar()
+    flashcard_label = tk.Label(learn_flashcards_window, textvariable=flashcard_text, font=('Arial', 16))
+    flashcard_label.grid(row=3, column=0, columnspan=4, pady=20)
+
+    
+def flip_flashcard():
+    global current_flashcard_index, current_flashcard_side
+    current_flashcard_side = "back" if current_flashcard_side == "front" else "front"
+    display_flashcard()
+    show_rating_buttons()
+
+def rate_flashcard(rating):
+    global current_flashcard_index
+    
+    current_flashcard_index += 1
+    if current_flashcard_index < len(current_deck_flashcards):
+        display_flashcard()
+        hide_rating_buttons()
+    else:
+        learn_flashcards_window.destroy()
+
+def select_deck(deck_name):
+    global current_deck_flashcards, current_flashcard_index, current_flashcard_side
+    current_deck_flashcards = flashcards_dict.get(deck_name, [])
+    current_flashcard_index = 0
+    current_flashcard_side = "front"
+    display_flashcard()
+    hide_rating_buttons()
+
+def display_flashcard():
+    current_flashcard = current_deck_flashcards[current_flashcard_index]
+    flashcard_text.set(current_flashcard[current_flashcard_side])
+
+def show_rating_buttons():
+    easy_button.grid(row=7, column=1, padx=10, pady=10, sticky="e")
+    good_button.grid(row=7, column=2, padx=10, pady=10, sticky="e")
+    hard_button.grid(row=7, column=3, padx=10, pady=10, sticky="e")
+
+def hide_rating_buttons():
+    easy_button.grid_forget()
+    good_button.grid_forget()
+    hard_button.grid_forget()
+
+
+
+
+deckTitle = tk.Label(root,text = "Main Menu",font=('Nexa', 40), bg="gray")
+deckTitle.grid(row=1, column=0, columnspan=3, pady=20)
 
 newDeck = ttk.Button(root,text="New deck",command = createNewDeck)
 viewDeck = ttk.Button(root,text="View decks",command = viewDecks)
 createCard = ttk.Button(root,text="Create cards",command = createCards)
 revise = ttk.Button(root,text="Revise Cards",command = reviewCards)
-viewDeck.grid(row=1, column=2, padx=5, pady=1, sticky='nsew')
-newDeck.grid(row=1, column=0, padx=5, pady=1, sticky='nsew')
-createCard.grid(row=1, column = 1, padx=5, pady=1, sticky='nsew')
-revise.grid(row=2, column = 1, padx=5, pady=20, sticky='nsew')
+viewDeck.grid(row=2, column=2, padx=5, pady=1, sticky='nsew')
+newDeck.grid(row=2, column=0, padx=5, pady=1, sticky='nsew')
+createCard.grid(row=2, column = 1, padx=5, pady=1, sticky='nsew')
+revise.grid(row=3, column = 1, padx=5, pady=20, sticky='nsew')
 
 
 root.mainloop()
