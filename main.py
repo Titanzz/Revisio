@@ -2,14 +2,12 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter import simpledialog
 
-
 root = tk.Tk()
 root.title("Revisio")
 root.geometry("600x600")
 root.columnconfigure(0, weight=1)
 root.columnconfigure(1, weight=1)
 root.columnconfigure(2, weight=1)
-
 
 def on_resize(event):
     new_width = event.width
@@ -27,7 +25,6 @@ root.bind("<Configure>", on_resize)
 decks = []
 flashcards_dict = {}
 
-
 def addDeck(inp):
     name = inp.get("1.0", "end-1c")
     decks.append([name])
@@ -35,20 +32,30 @@ def addDeck(inp):
     
 def viewDecks():
     new_window = tk.Toplevel()
-    deck_name_heading = tk.Label(new_window, text="Deck Name", font=('Arial', 12, 'bold'))
-    deck_name_heading.grid(row=0, column=0)
-    num_cards_heading = tk.Label(new_window, text="Number of Cards", font=('Arial', 12, 'bold'))
-    num_cards_heading.grid(row=0, column=1, padx=1)
-    new_window.grid_rowconfigure(1, weight=1)
+    new_window.title("View Decks")
+    new_window.grid_rowconfigure(0, weight=1)
     new_window.grid_columnconfigure(0, weight=1)
     new_window.grid_columnconfigure(1, weight=1)
-
-
-    for i, deck_info in enumerate(decks, start=1):
-        deck_name = deck_info[0]
+    
+    deck_name_heading = tk.Label(new_window, text="Deck Name", font=('Arial', 12, 'bold'))
+    deck_name_heading.grid(row=0, column=0)
+    
+    num_cards_heading = tk.Label(new_window, text="Number of Cards", font=('Arial', 12, 'bold'))
+    num_cards_heading.grid(row=0, column=1, padx=1)
+    new_window.grid_rowconfigure(0, weight=1)
+    row = 1  
+    
+    for deck_name, flashcards in flashcards_dict.items():
+        card_count = len(flashcards)
+        new_window.grid_rowconfigure(row, weight=1)
+        
         deck_label = tk.Label(new_window, text=deck_name)
-        deck_label.grid(row=i, column=0)
-
+        deck_label.grid(row=row, column=0, padx=5, pady=5, sticky="w")
+        
+        num_cards_label = tk.Label(new_window, text=card_count)
+        num_cards_label.grid(row=row, column=1, padx=5, pady=5, sticky="e")
+        row += 1  
+        
 def close(window):
     window.destroy()
 
@@ -92,8 +99,6 @@ def createCards():
     except:
             tk.messagebox.showerror("Error", "There are no decks to add cards to.")
             close(menu_window)
-
-
 
 def add_flashcard():
     global flashcard_front_input
