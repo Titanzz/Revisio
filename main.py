@@ -1,11 +1,12 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter import simpledialog
+import sv_ttk
 
 root = tk.Tk()
 root.title("Revisio")
 root.geometry("600x600")
-root.configure(bg="gray")
+#root.configure(bg="gray")
 root.columnconfigure(0, weight=1)
 root.columnconfigure(1, weight=1)
 root.columnconfigure(2, weight=1)
@@ -13,13 +14,20 @@ root.columnconfigure(2, weight=1)
 def open_settings():
     settings_window = tk.Toplevel(root)
     settings_window.title("Settings")
+    settings_window.geometry("300x300")
+    settings_window.columnconfigure(0, weight=1) 
+    settings_window.rowconfigure(0, weight=1)
+    settings_window.rowconfigure(1, weight=1)
+    button = ttk.Button(settings_window, text="Toggle theme", command=sv_ttk.toggle_theme)
+    button.grid(row=1, column=0)
+    
 
-toolbar_frame = tk.Frame(root, bg="gray")
+toolbar_frame = tk.Frame(root)
 toolbar_frame.grid(row=0, column=0, columnspan=3, sticky="ew")
 settings_button = ttk.Button(toolbar_frame, text="Settings", command=open_settings)
 settings_button.grid(row=0, column=2, padx=10, pady=5)
 
-
+sv_ttk.set_theme("dark")
 decks = []
 flashcards_dict = {}
 
@@ -139,11 +147,11 @@ def reviewCards():
 
     global easy_button, good_button, hard_button
     easy_button = tk.Button(learn_flashcards_window, text="Easy", font=('Arial', 15), command=lambda: rate_flashcard("Easy"), bg="green")
-    good_button = tk.Button(learn_flashcards_window, text="Good", font=('Arial', 15), command=lambda: rate_flashcard("Good"), bg="yellow")
+    good_button = tk.Button(learn_flashcards_window, text="Good", font=('Arial', 15), command=lambda: rate_flashcard("Good"), bg="orange")
     hard_button = tk.Button(learn_flashcards_window, text="Hard", font=('Arial', 15), command=lambda: rate_flashcard("Hard"), bg="red")
 
     flip_button = tk.Button(learn_flashcards_window, text="Flip", font=('Arial', 15), command=flip_flashcard)
-    flip_button.grid(row=2, column=0, padx=10, pady=20)
+    flip_button.grid(row=7, column=0, padx=10, pady=20)
 
     global flashcard_text
     flashcard_text = tk.StringVar()
@@ -192,7 +200,7 @@ def hide_rating_buttons():
 
 
 
-deckTitle = tk.Label(root,text = "Main Menu",font=('Nexa', 40), bg="gray")
+deckTitle = tk.Label(root,text = "Main Menu",font=('Nexa', 40))
 deckTitle.grid(row=1, column=0, columnspan=3, pady=20)
 
 newDeck = ttk.Button(root,text="New deck",command = createNewDeck)
