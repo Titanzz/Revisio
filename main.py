@@ -200,7 +200,7 @@ def hide_rating_buttons():
 
 
 
-deckTitle = tk.Label(root,text = "Main Menu",font=('Nexa', 40))
+deckTitle = tk.Label(root,text = "Revisio",font=('Nexa', 40))
 deckTitle.grid(row=1, column=0, columnspan=3, pady=20)
 
 newDeck = ttk.Button(root,text="New deck",command = createNewDeck)
