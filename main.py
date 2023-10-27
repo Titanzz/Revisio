@@ -34,7 +34,7 @@ flashcards_dict = {}
 
 def addDeck(inp):
     name = inp.get("1.0", "end-1c")
-    decks.append([name])
+    decks.append([name.rstrip()])
     print(decks)
     
 def viewDecks():
@@ -119,7 +119,7 @@ def add_flashcard():
 
     if selected_deck not in flashcards_dict:
         flashcards_dict[selected_deck] = []
-    flashcards_dict[selected_deck].append({"front": front_text, "back": back_text})
+    flashcards_dict[selected_deck].append({"front": front_text.rstrip(), "back": back_text.rstrip()})
     print(flashcards_dict)
 
 def reviewCards():
