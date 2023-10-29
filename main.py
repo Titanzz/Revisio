@@ -2,6 +2,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter import simpledialog
 import sv_ttk
+import json
 
 root = tk.Tk()
 root.title("Revisio")
@@ -10,6 +11,7 @@ root.geometry("600x600")
 root.columnconfigure(0, weight=1)
 root.columnconfigure(1, weight=1)
 root.columnconfigure(2, weight=1)
+
 
 def open_settings():
     settings_window = tk.Toplevel(root)
@@ -26,10 +28,19 @@ toolbar_frame = tk.Frame(root)
 toolbar_frame.grid(row=0, column=0, columnspan=3, sticky="ew")
 settings_button = ttk.Button(toolbar_frame, text="Settings", command=open_settings)
 settings_button.grid(row=0, column=2, padx=10, pady=5)
-
 sv_ttk.set_theme("dark")
+
 decks = []
 flashcards_dict = {}
+try:
+    file = open("flashcards", "r")
+    flashcards_dict = json.load(file)
+    file.close()
+    file = open("decks", "r")
+    decks = json.load(file)
+    file.close()
+except:
+    pass
 
 
 def addDeck(inp):
@@ -119,7 +130,7 @@ def add_flashcard():
 
     if selected_deck not in flashcards_dict:
         flashcards_dict[selected_deck] = []
-    flashcards_dict[selected_deck].append({"front": front_text.rstrip(), "back": back_text.rstrip()})
+    flashcards_dict[selected_deck].append({"front": front_text.rstrip(), "back": back_text.rstrip(), "time": 0})
     print(flashcards_dict)
 
 def reviewCards():
@@ -212,6 +223,18 @@ newDeck.grid(row=2, column=0, padx=5, pady=1, sticky='nsew')
 createCard.grid(row=2, column = 1, padx=5, pady=1, sticky='nsew')
 revise.grid(row=3, column = 1, padx=5, pady=20, sticky='nsew')
 
+
+
+def on_closing():
+    file = open("flashcards", "w")
+    json.dump(flashcards_dict, file)
+    file.close()
+    file = open("decks", "w")
+    json.dump(decks, file)
+    file.close()
+    root.destroy()
+
+root.protocol("WM_DELETE_WINDOW", on_closing)
 
 root.mainloop()
 
