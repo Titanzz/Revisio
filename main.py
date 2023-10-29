@@ -4,49 +4,36 @@ from tkinter import simpledialog
 import sv_ttk
 import json
 
-root = tk.Tk()
-root.title("Revisio")
-root.geometry("600x600")
-#root.configure(bg="gray")
-root.columnconfigure(0, weight=1)
-root.columnconfigure(1, weight=1)
-root.columnconfigure(2, weight=1)
-
-
-def open_settings():
-    settings_window = tk.Toplevel(root)
-    settings_window.title("Settings")
-    settings_window.geometry("300x300")
-    settings_window.columnconfigure(0, weight=1) 
-    settings_window.rowconfigure(0, weight=1)
-    settings_window.rowconfigure(1, weight=1)
-    button = ttk.Button(settings_window, text="Toggle theme", command=sv_ttk.toggle_theme)
-    button.grid(row=1, column=0)
-    
-
-toolbar_frame = tk.Frame(root)
-toolbar_frame.grid(row=0, column=0, columnspan=3, sticky="ew")
-settings_button = ttk.Button(toolbar_frame, text="Settings", command=open_settings)
-settings_button.grid(row=0, column=2, padx=10, pady=5)
-sv_ttk.set_theme("dark")
-
-decks = []
-flashcards_dict = {}
-try:
-    file = open("flashcards", "r")
-    flashcards_dict = json.load(file)
-    file.close()
-    file = open("decks", "r")
-    decks = json.load(file)
-    file.close()
-except:
-    pass
+        
+def close(window):
+    window.destroy()
 
 
 def addDeck(inp):
     name = inp.get("1.0", "end-1c")
-    decks.append([name.rstrip()])
-    print(decks)
+    if not name:
+        tk.messagebox.showerror("Error", "Deck name is empty")
+    else:
+        decks.append([name.rstrip()])
+        print(decks)
+
+def add_flashcard():
+    global flashcard_front_input
+    global flashcard_back_input
+    global deck_dropdown
+    front_text = flashcard_front_input.get("1.0", "end-1c")
+    back_text = flashcard_back_input.get("1.0", "end-1c")
+    selected_deck = deck_dropdown.get()
+    flashcard_front_input.delete("1.0", "end")
+    flashcard_back_input.delete("1.0", "end")
+
+    if not front_text or not back_text:
+        tk.messagebox.showerror("Error", "Contents flashcard is empty")
+    else:
+        if selected_deck not in flashcards_dict:
+            flashcards_dict[selected_deck] = []
+        flashcards_dict[selected_deck].append({"front": front_text.rstrip(), "back": back_text.rstrip(), "time": 0})
+        print(flashcards_dict)
     
 def viewDecks():
     new_window = tk.Toplevel()
@@ -73,9 +60,6 @@ def viewDecks():
         num_cards_label = tk.Label(new_window, text=card_count)
         num_cards_label.grid(row=row, column=1, padx=5, pady=5, sticky="e")
         row += 1  
-        
-def close(window):
-    window.destroy()
 
 def createNewDeck():
    top = tk.Toplevel(root)
@@ -117,21 +101,6 @@ def createCards():
     except:
             tk.messagebox.showerror("Error", "There are no decks to add cards to.")
             close(menu_window)
-
-def add_flashcard():
-    global flashcard_front_input
-    global flashcard_back_input
-    global deck_dropdown
-    front_text = flashcard_front_input.get("1.0", "end-1c")
-    back_text = flashcard_back_input.get("1.0", "end-1c")
-    selected_deck = deck_dropdown.get()
-    flashcard_front_input.delete("1.0", "end")
-    flashcard_back_input.delete("1.0", "end")
-
-    if selected_deck not in flashcards_dict:
-        flashcards_dict[selected_deck] = []
-    flashcards_dict[selected_deck].append({"front": front_text.rstrip(), "back": back_text.rstrip(), "time": 0})
-    print(flashcards_dict)
 
 def reviewCards():
     global learn_flashcards_window, easy_button, good_button, hard_button
@@ -209,7 +178,41 @@ def hide_rating_buttons():
     hard_button.grid_forget()
 
 
+root = tk.Tk()
+root.title("Revisio")
+root.geometry("600x600")
+#root.configure(bg="gray")
+root.columnconfigure(0, weight=1)
+root.columnconfigure(1, weight=1)
+root.columnconfigure(2, weight=1)
 
+def open_settings():
+    settings_window = tk.Toplevel(root)
+    settings_window.title("Settings")
+    settings_window.geometry("300x300")
+    settings_window.columnconfigure(0, weight=1) 
+    settings_window.rowconfigure(0, weight=1)
+    settings_window.rowconfigure(1, weight=1)
+    button = ttk.Button(settings_window, text="Toggle theme", command=sv_ttk.toggle_theme)
+    button.grid(row=1, column=0)
+    
+toolbar_frame = tk.Frame(root)
+toolbar_frame.grid(row=0, column=0, columnspan=3, sticky="ew")
+settings_button = ttk.Button(toolbar_frame, text="Settings", command=open_settings)
+settings_button.grid(row=0, column=2, padx=10, pady=5)
+sv_ttk.set_theme("dark")
+
+decks = []
+flashcards_dict = {}
+try:
+    file = open("flashcards", "r")
+    flashcards_dict = json.load(file)
+    file.close()
+    file = open("decks", "r")
+    decks = json.load(file)
+    file.close()
+except:
+    pass
 
 deckTitle = tk.Label(root,text = "Revisio",font=('Nexa', 40))
 deckTitle.grid(row=1, column=0, columnspan=3, pady=20)
@@ -222,8 +225,6 @@ viewDeck.grid(row=2, column=2, padx=5, pady=1, sticky='nsew')
 newDeck.grid(row=2, column=0, padx=5, pady=1, sticky='nsew')
 createCard.grid(row=2, column = 1, padx=5, pady=1, sticky='nsew')
 revise.grid(row=3, column = 1, padx=5, pady=20, sticky='nsew')
-
-
 
 def on_closing():
     file = open("flashcards", "w")
