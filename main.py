@@ -127,9 +127,11 @@ def reviewCards():
 
     global easy_button, good_button, hard_button
     easy_button = tk.Button(learn_flashcards_window, text="Easy", font=('Arial', 15), command=lambda: rate_flashcard("Easy"), bg="green")
+    #button for easy triggers the rate_flashcard function and "Easy" is given as the response
     good_button = tk.Button(learn_flashcards_window, text="Good", font=('Arial', 15), command=lambda: rate_flashcard("Good"), bg="orange")
+    #button for good triggers the rate_flashcard function and "Good" is given as the response
     hard_button = tk.Button(learn_flashcards_window, text="Hard", font=('Arial', 15), command=lambda: rate_flashcard("Hard"), bg="red")
-
+    #button for hard triggers the rate_flashcard function and "Hard" is given as the response
     flip_button = tk.Button(learn_flashcards_window, text="Flip", font=('Arial', 15), command=flip_flashcard)
     flip_button.grid(row=7, column=0, padx=10, pady=20)
 
@@ -164,15 +166,18 @@ def select_deck(deck_name):
     hide_rating_buttons()
 
 def display_flashcard():
-    current_flashcard = current_deck_flashcards[current_flashcard_index]
-    flashcard_text.set(current_flashcard[current_flashcard_side])
+    try:
+        current_flashcard = current_deck_flashcards[current_flashcard_index]
+        flashcard_text.set(current_flashcard[current_flashcard_side])
+    except:
+        tk.messagebox.showerror("Error", "No flashcards to review in this deck")
 
-def show_rating_buttons():
+def show_rating_buttons(): # These show the ratings button when the flashcard is flipped
     easy_button.grid(row=7, column=1, padx=10, pady=10, sticky="e")
     good_button.grid(row=7, column=2, padx=10, pady=10, sticky="e")
     hard_button.grid(row=7, column=3, padx=10, pady=10, sticky="e")
 
-def hide_rating_buttons():
+def hide_rating_buttons(): # These make the buttons dissapear when the flashcard is front sided
     easy_button.grid_forget()
     good_button.grid_forget()
     hard_button.grid_forget()
@@ -187,13 +192,14 @@ root.columnconfigure(1, weight=1)
 root.columnconfigure(2, weight=1)
 
 def open_settings():
-    settings_window = tk.Toplevel(root)
+    settings_window = tk.Toplevel(root) # creates a new menu
     settings_window.title("Settings")
     settings_window.geometry("300x300")
     settings_window.columnconfigure(0, weight=1) 
     settings_window.rowconfigure(0, weight=1)
     settings_window.rowconfigure(1, weight=1)
     button = ttk.Button(settings_window, text="Toggle theme", command=sv_ttk.toggle_theme)
+    # the line above: after pressing the toggle theme button this command is what changes the theme.
     button.grid(row=1, column=0)
     
 toolbar_frame = tk.Frame(root)
@@ -201,6 +207,8 @@ toolbar_frame.grid(row=0, column=0, columnspan=3, sticky="ew")
 settings_button = ttk.Button(toolbar_frame, text="Settings", command=open_settings)
 settings_button.grid(row=0, column=2, padx=10, pady=5)
 sv_ttk.set_theme("dark")
+#This is the code for the toolbar where the button is
+
 
 decks = []
 flashcards_dict = {}
@@ -213,6 +221,7 @@ try:
     file.close()
 except:
     pass
+#json is used to handle saving and downloading the flashcards.
 
 deckTitle = tk.Label(root,text = "Revisio",font=('Nexa', 40))
 deckTitle.grid(row=1, column=0, columnspan=3, pady=20)
@@ -235,7 +244,7 @@ def on_closing():
     file.close()
     root.destroy()
 
-root.protocol("WM_DELETE_WINDOW", on_closing)
+root.protocol("WM_DELETE_WINDOW", on_closing) #calls on_closing when window is closed
 
 root.mainloop()
 
