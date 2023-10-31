@@ -14,7 +14,7 @@ def addDeck(inp):
     if not name:
         tk.messagebox.showerror("Error", "Deck name is empty")
     else:
-        decks.append([name.rstrip()])
+        decks.append(name.rstrip())
         print(decks)
 
 def add_flashcard():
@@ -33,33 +33,58 @@ def add_flashcard():
         if selected_deck not in flashcards_dict:
             flashcards_dict[selected_deck] = []
         flashcards_dict[selected_deck].append({"front": front_text.rstrip(), "back": back_text.rstrip(), "time": 0})
-        print(flashcards_dict)
-    
+        print(flashcards_dict)    
+        
 def viewDecks():
-    new_window = tk.Toplevel()
-    new_window.title("View Decks")
-    new_window.grid_rowconfigure(0, weight=1)
-    new_window.grid_columnconfigure(0, weight=1)
-    new_window.grid_columnconfigure(1, weight=1)
+    decks_window = tk.Toplevel()
+    decks_window.title("Decks")
+
+    tk.Label(decks_window, text="Deck Names", font=('Arial', 16, 'bold')).grid(row=0, column=0, columnspan=3)
+
+    decks_window.columnconfigure(0, weight=1)
+    decks_window.columnconfigure(1, weight=1)
+    decks_window.columnconfigure(2, weight=1)
+
+    def delete_deck(deck_name):
+        if deck_name in flashcards_dict:
+            print(decks)
+            del flashcards_dict[deck_name]
+            pointer = decks.index(deck_name)
+            decks.pop(pointer)
+            decks_window.destroy()
+            viewDecks()
+
+    for i, deck_name in enumerate(flashcards_dict, start=1):
+        tk.Label(decks_window, text=deck_name).grid(row=i, column=0, padx=5, pady=5, sticky='w')
+        tk.Button(decks_window, text="View Flashcards", command=lambda name=deck_name: view_flashcards(name)).grid(row=i, column=2, padx=5, pady=5)
+        tk.Button(decks_window, text="Delete Deck", command=lambda name=deck_name: delete_deck(name)).grid(row=i, column=1, padx=5, pady=5)
+
+    for i in range(1, len(flashcards_dict) + 1):
+        decks_window.rowconfigure(i, weight=1)
+
+def view_flashcards(deck_name):
+    flashcards_window = tk.Toplevel(root)
+    flashcards_window.title(deck_name)
+    flashcards_window.grid_columnconfigure(1, weight=1)
+    flashcards_window.grid_columnconfigure(2, weight=1)
+    flashcards_window.grid_columnconfigure(3, weight=1)
+    flashcards_window.grid_rowconfigure(0, weight=1)
+
+    def delete_flashcard(flashcard, frame):
+        flashcards_dict[deck_name].remove(flashcard)
+        frame.destroy()
     
-    deck_name_heading = tk.Label(new_window, text="Deck Name", font=('Arial', 12, 'bold'))
-    deck_name_heading.grid(row=0, column=0)
-    
-    num_cards_heading = tk.Label(new_window, text="Number of Cards", font=('Arial', 12, 'bold'))
-    num_cards_heading.grid(row=0, column=1, padx=1)
-    new_window.grid_rowconfigure(0, weight=1)
-    row = 1  
-    
-    for deck_name, flashcards in flashcards_dict.items():
-        card_count = len(flashcards)
-        new_window.grid_rowconfigure(row, weight=1)
-        
-        deck_label = tk.Label(new_window, text=deck_name)
-        deck_label.grid(row=row, column=0, padx=5, pady=5, sticky="w")
-        
-        num_cards_label = tk.Label(new_window, text=card_count)
-        num_cards_label.grid(row=row, column=1, padx=5, pady=5, sticky="e")
-        row += 1  
+    for i, flashcard in enumerate(flashcards_dict[deck_name], start=1):
+        flashcards_window.grid_rowconfigure(i, weight=1)
+        front = flashcard['front']
+        back = flashcard['back']
+        flashcard_frame = tk.Frame(flashcards_window)
+        tk.Label(flashcard_frame, text=f'Front: {front}').grid(row=0, column=1,padx=5, pady=1, sticky='nsew')
+        tk.Label(flashcard_frame, text=f'Back: {back}').grid(row=0, column=2,padx=5, pady=1, sticky='nsew')
+        delete_button = tk.Button(flashcard_frame, text="Delete", command=lambda card=flashcard, frame=flashcard_frame: delete_flashcard(card, frame))
+        delete_button.grid(row=0, column=3,padx=5, pady=1, sticky='nsew' )
+        flashcard_frame.grid(row=i, column=0, padx=10, pady=5,sticky='nsew')
+
 
 def createNewDeck():
    top = tk.Toplevel(root)
@@ -93,7 +118,7 @@ def createCards():
     global deck_dropdown
     deck_dropdown = tk.StringVar(menu_window)
     try:
-        deck_dropdown.set(decks[0][0])
+        deck_dropdown.set(decks[0])
         deck_menu = tk.OptionMenu(menu_window, deck_dropdown, *decks)
         deck_menu.grid(row=6, column=0)
         add_flashcard_button = tk.Button(menu_window, text="Add Flashcard", command=add_flashcard)
@@ -118,7 +143,7 @@ def reviewCards():
     deck_label.grid(row=0, column=0, columnspan=4, pady=5)
 
     deck_dropdown = tk.StringVar(learn_flashcards_window)
-    deck_dropdown.set(decks[0][0])
+    deck_dropdown.set(decks[0])
     deck_menu = tk.OptionMenu(learn_flashcards_window, deck_dropdown, *decks)
     deck_menu.grid(row=1, column=0, columnspan=2, pady=5)
 
