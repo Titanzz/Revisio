@@ -158,7 +158,10 @@ def reviewCards():
     deck_label.grid(row=0, column=0, columnspan=4, pady=5)
 
     deck_dropdown = tk.StringVar(learn_flashcards_window)
-    deck_dropdown.set(decks[0])
+    try:
+        deck_dropdown.set(decks[0])
+    except:
+        tk.messagebox.showerror("Error", "No decks to review")
     deck_menu = tk.OptionMenu(learn_flashcards_window, deck_dropdown, *decks)
     deck_menu.grid(row=1, column=0, columnspan=2, pady=5)
 
@@ -226,8 +229,11 @@ def select_deck(deck_name):
         if flashcard.get("time", 0) == 0:
             reviewFlashcards.append(i)
     print(reviewFlashcards)
-    nextIndex = reviewFlashcards[0]
-    reviewFlashcards.pop(0)
+    try:
+        nextIndex = reviewFlashcards[0]
+        reviewFlashcards.pop(0)
+    except:
+        tk.messagebox.showerror("Error", "Deck has been completed. No flashcards due")
     display_flashcard()
     hide_rating_buttons()
 
