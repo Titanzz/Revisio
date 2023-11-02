@@ -25,10 +25,15 @@ def addDeck(inp):
         decks.append(name.rstrip())
         #print(decks)
 
+def add_edit(flashcard):
+    global frontEdit, backEdit
+    front_text = frontEdit.get("1.0", "end-1c")
+    back_text = backEdit.get("1.0", "end-1c")
+    flashcard["front"] = front_text
+    flashcard["back"] = back_text
+
 def add_flashcard():
-    global flashcard_front_input
-    global flashcard_back_input
-    global deck_dropdown
+    global flashcard_front_input, flashcard_back_input, deck_dropdown
     front_text = flashcard_front_input.get("1.0", "end-1c")
     back_text = flashcard_back_input.get("1.0", "end-1c")
     selected_deck = deck_dropdown.get()
@@ -60,7 +65,7 @@ def viewDecks():
             pointer = decks.index(deck_name)
             decks.pop(pointer)
             decks_window.destroy()
-            viewDecks()
+            viewDecks()     
 
     for i, deck_name in enumerate(flashcards_dict, start=1): #for loops lists all the decks
         tk.Label(decks_window, text=deck_name).grid(row=i, column=0, padx=5, pady=5, sticky='w')
@@ -79,9 +84,32 @@ def view_flashcards(deck_name):
     flashcards_window.columnconfigure(0, weight=1)
     flashcards_window.rowconfigure(0, weight=1)
 
+    def edit_flashcard(flashcard):
+        f = flashcard
+        menu = tk.Toplevel(root)
+        menu.title("Edit flashcard")
+        flashcard_front_heading = tk.Label(menu, text="Flashcard Front", font=('Arial', 30, 'bold'))
+        flashcard_front_heading.grid(row=0, column=0, pady=10)
+        global frontEdit
+        frontEdit = tk.Text(menu, height=5)
+        frontEdit.grid(row=1, column=0, pady=10)
+
+        flashcard_back_heading = tk.Label(menu, text="Flashcard Back", font=('Arial', 30, 'bold'))
+        flashcard_back_heading.grid(row=2, column=0, pady=10)
+        global backEdit
+        backEdit = tk.Text(menu, height=5)
+        backEdit.grid(row=3, column=0, pady=10)
+
+        editButton = tk.Button(menu, text="Edit", command=lambda card=f:[add_edit(card), close(menu)] )
+        editButton.grid(row=4, column=0, pady=10)
+        
     def delete_flashcard(flashcard, frame): #function that deletes a flashcard if clicked.
         flashcards_dict[deck_name].remove(flashcard)
         frame.destroy()
+
+    def reset_flashcard(flashcard):
+        flashcard['time'] = 0
+        flashcard['cardFactor'] = 1
 
     for i, flashcard in enumerate(flashcards_dict[deck_name], start=1): #loops through all the cards
         front = flashcard['front']
@@ -92,11 +120,17 @@ def view_flashcards(deck_name):
         flashcardFrame.columnconfigure(0, weight=1)
         flashcardFrame.columnconfigure(1, weight=1)
         flashcardFrame.columnconfigure(2, weight=1)
+        flashcardFrame.columnconfigure(3, weight=1)
+        flashcardFrame.columnconfigure(4, weight=1)
 
         tk.Label(flashcardFrame, text=f'Front: {front}').grid(row=0, column=0, padx=5, pady=1, sticky='nsew')
         tk.Label(flashcardFrame, text=f'Back: {back}').grid(row=0, column=1, padx=5, pady=1, sticky='nsew')
         delete_button = tk.Button(flashcardFrame, text="Delete", command=lambda card=flashcard, frame=flashcardFrame: delete_flashcard(card, frame))
         delete_button.grid(row=0, column=2, padx=5, pady=1, sticky='nsew')
+        reset_button = tk.Button(flashcardFrame, text="Reset", command=lambda card=flashcard: reset_flashcard(card))
+        reset_button.grid(row=0, column=3, padx=5, pady=1, sticky='nsew')
+        edit_button = tk.Button(flashcardFrame, text="Edit", command=lambda card=flashcard: edit_flashcard(card))
+        edit_button.grid(row=0, column=4, padx=5, pady=1, sticky='nsew')
 
     flashcards_window.grid_rowconfigure(i+1, weight=1)
 
