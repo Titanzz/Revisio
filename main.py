@@ -45,7 +45,7 @@ def viewDecks():
     decks_window = tk.Toplevel()
     decks_window.title("Decks")
 
-    tk.Label(decks_window, text="Deck Names", font=('Arial', 16, 'bold')).grid(row=0, column=0, columnspan=3)
+    tk.Label(decks_window, text="All Decks", font=('Arial', 16, 'bold')).grid(row=0, column=0, columnspan=3)
 
     decks_window.columnconfigure(0, weight=1)
     decks_window.columnconfigure(1, weight=1)
@@ -71,25 +71,34 @@ def viewDecks():
 def view_flashcards(deck_name):
     flashcards_window = tk.Toplevel(root)
     flashcards_window.title(deck_name)
-    flashcards_window.grid_columnconfigure(1, weight=1)
-    flashcards_window.grid_columnconfigure(2, weight=1)
-    flashcards_window.grid_columnconfigure(3, weight=1)
-    flashcards_window.grid_rowconfigure(0, weight=1)
+
+    tk.Label(flashcards_window, text=deck_name, font=('Arial', 16, 'bold')).grid(row=0, column=0, columnspan=3)
+
+    flashcards_window.columnconfigure(0, weight=1)
+    flashcards_window.rowconfigure(0, weight=1)
 
     def delete_flashcard(flashcard, frame):
         flashcards_dict[deck_name].remove(flashcard)
         frame.destroy()
-    
+
     for i, flashcard in enumerate(flashcards_dict[deck_name], start=1):
-        flashcards_window.grid_rowconfigure(i, weight=1)
         front = flashcard['front']
         back = flashcard['back']
         flashcard_frame = tk.Frame(flashcards_window)
-        tk.Label(flashcard_frame, text=f'Front: {front}').grid(row=0, column=1,padx=5, pady=1, sticky='nsew')
-        tk.Label(flashcard_frame, text=f'Back: {back}').grid(row=0, column=2,padx=5, pady=1, sticky='nsew')
+        flashcard_frame.grid(row=i, column=0, padx=10, pady=5, sticky='nsew')
+
+        flashcard_frame.columnconfigure(0, weight=1)
+        flashcard_frame.columnconfigure(1, weight=1)
+        flashcard_frame.columnconfigure(2, weight=1)
+
+        tk.Label(flashcard_frame, text=f'Front: {front}').grid(row=0, column=0, padx=5, pady=1, sticky='nsew')
+        tk.Label(flashcard_frame, text=f'Back: {back}').grid(row=0, column=1, padx=5, pady=1, sticky='nsew')
         delete_button = tk.Button(flashcard_frame, text="Delete", command=lambda card=flashcard, frame=flashcard_frame: delete_flashcard(card, frame))
-        delete_button.grid(row=0, column=3,padx=5, pady=1, sticky='nsew' )
-        flashcard_frame.grid(row=i, column=0, padx=10, pady=5,sticky='nsew')
+        delete_button.grid(row=0, column=2, padx=5, pady=1, sticky='nsew')
+
+    flashcards_window.grid_rowconfigure(i+1, weight=1)
+
+
 
 
 def createNewDeck():
