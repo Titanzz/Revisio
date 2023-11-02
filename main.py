@@ -4,6 +4,12 @@ from tkinter import simpledialog
 import sv_ttk
 import json
 
+easyFactor = 3.0
+goodFactor = 1.5
+hardFactor = 1.0
+easyIncrement = 2
+goodIncrement = 1
+hardIncrement = -1
         
 def close(window):
     window.destroy()
@@ -15,7 +21,7 @@ def addDeck(inp):
         tk.messagebox.showerror("Error", "Deck name is empty")
     else:
         decks.append(name.rstrip())
-        print(decks)
+        #print(decks)
 
 def add_flashcard():
     global flashcard_front_input
@@ -32,8 +38,8 @@ def add_flashcard():
     else:
         if selected_deck not in flashcards_dict:
             flashcards_dict[selected_deck] = []
-        flashcards_dict[selected_deck].append({"front": front_text.rstrip(), "back": back_text.rstrip(), "time": 0})
-        print(flashcards_dict)    
+        flashcards_dict[selected_deck].append({"front": front_text.rstrip(), "back": back_text.rstrip(), "time": 0, "cardFactor": 1})
+        #print(flashcards_dict)    
         
 def viewDecks():
     decks_window = tk.Toplevel()
@@ -47,7 +53,7 @@ def viewDecks():
 
     def delete_deck(deck_name):
         if deck_name in flashcards_dict:
-            print(decks)
+            #print(decks)
             del flashcards_dict[deck_name]
             pointer = decks.index(deck_name)
             decks.pop(pointer)
@@ -174,7 +180,28 @@ def flip_flashcard():
 
 def rate_flashcard(rating):
     global current_flashcard_index
-    
+    time = current_flashcard["time"]
+    originalFactor = current_flashcard["cardFactor"]
+
+    if rating == "Easy":
+        current_flashcard["time"] += originalFactor * easyFactor
+        current_flashcard["cardFactor"] += easyIncrement
+        print(current_flashcard["cardFactor"])
+        print(current_flashcard["time"])
+    elif rating == "Good":
+        current_flashcard["time"] += originalFactor * goodFactor
+        current_flashcard["cardFactor"] += goodIncrement
+        print(current_flashcard["cardFactor"])
+        print(current_flashcard["time"])
+    elif rating == "Hard":
+        current_flashcard["time"] += originalFactor * hardFactor
+        if current_flashcard["cardFactor"] == 0:
+            pass
+        else:
+            current_flashcard["cardFactor"] += hardIncrement
+        print(current_flashcard["cardFactor"])
+        print(current_flashcard["time"])
+
     current_flashcard_index += 1
     if current_flashcard_index < len(current_deck_flashcards):
         display_flashcard()
@@ -192,6 +219,7 @@ def select_deck(deck_name):
     hide_rating_buttons()
 
 def display_flashcard():
+    global current_flashcard
     try:
         current_flashcard = current_deck_flashcards[current_flashcard_index]
         flashcard_text.set(current_flashcard[current_flashcard_side])
