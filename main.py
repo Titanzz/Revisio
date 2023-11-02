@@ -167,11 +167,8 @@ def reviewCards():
 
     global easy_button, good_button, hard_button
     easy_button = tk.Button(learn_flashcards_window, text="Easy", font=('Arial', 15), command=lambda: rate_flashcard("Easy"), bg="green")
-    #button for easy triggers the rate_flashcard function and "Easy" is given as the response
     good_button = tk.Button(learn_flashcards_window, text="Good", font=('Arial', 15), command=lambda: rate_flashcard("Good"), bg="orange")
-    #button for good triggers the rate_flashcard function and "Good" is given as the response
     hard_button = tk.Button(learn_flashcards_window, text="Hard", font=('Arial', 15), command=lambda: rate_flashcard("Hard"), bg="red")
-    #button for hard triggers the rate_flashcard function and "Hard" is given as the response
     flip_button = tk.Button(learn_flashcards_window, text="Flip", font=('Arial', 15), command=flip_flashcard)
     flip_button.grid(row=7, column=0, padx=10, pady=20)
 
@@ -182,13 +179,13 @@ def reviewCards():
 
     
 def flip_flashcard():
-    global current_flashcard_index, current_flashcard_side
+    global nextIndex, current_flashcard_side
     current_flashcard_side = "back" if current_flashcard_side == "front" else "front"
     display_flashcard()
     show_rating_buttons()
 
 def rate_flashcard(rating):
-    global current_flashcard_index
+    global nextIndex, reviewFlashcards
     time = current_flashcard["time"]
     originalFactor = current_flashcard["cardFactor"]
 
@@ -210,27 +207,34 @@ def rate_flashcard(rating):
             current_flashcard["cardFactor"] += hardIncrement
         print(current_flashcard["cardFactor"])
         print(current_flashcard["time"])
-
-    current_flashcard_index += 1
-    if current_flashcard_index < len(current_deck_flashcards):
+    try:
+        nextIndex = reviewFlashcards[0]
+        reviewFlashcards.pop(0)
         display_flashcard()
         flip_flashcard()
         hide_rating_buttons()
-    else:
+    except:
+        tk.messagebox.showerror("Error", "All due flashcards have been reviewed.")
         learn_flashcards_window.destroy()
 
 def select_deck(deck_name):
-    global current_deck_flashcards, current_flashcard_index, current_flashcard_side
+    global current_deck_flashcards, nextIndex, current_flashcard_side, reviewFlashcards
     current_deck_flashcards = flashcards_dict.get(deck_name, [])
-    current_flashcard_index = 0
     current_flashcard_side = "front"
+    reviewFlashcards = []
+    for i, flashcard in enumerate(current_deck_flashcards):
+        if flashcard.get("time", 0) == 0:
+            reviewFlashcards.append(i)
+    print(reviewFlashcards)
+    nextIndex = reviewFlashcards[0]
+    reviewFlashcards.pop(0)
     display_flashcard()
     hide_rating_buttons()
 
 def display_flashcard():
     global current_flashcard
     try:
-        current_flashcard = current_deck_flashcards[current_flashcard_index]
+        current_flashcard = current_deck_flashcards[nextIndex]
         flashcard_text.set(current_flashcard[current_flashcard_side])
     except:
         tk.messagebox.showerror("Error", "No flashcards to review in this deck")
