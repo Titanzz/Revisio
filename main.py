@@ -3,6 +3,7 @@ import tkinter.ttk as ttk
 from tkinter import simpledialog
 import sv_ttk
 import json
+import time
 
 easyFactor = 3.0
 goodFactor = 1.5
@@ -11,11 +12,23 @@ easyIncrement = 2
 goodIncrement = 1
 hardIncrement = -1
 
+flashcardsLearnt = 0
+easy = 0
+good = 0
+hard = 0
+
 #setting base values for the algorithm to use
         
 def close(window):
     window.destroy()
 
+def startTime():
+    global start
+    start = time.time()
+
+def stopTime():
+    global elapsedTime
+    elapsedTime = round((time.time() - start) / 60, 2)
 
 def addDeck(inp):
     name = inp.get("1.0", "end-1c")
@@ -179,6 +192,7 @@ def createCards():
             close(menu_window)
 
 def reviewCards():
+    startTime()
     global learn_flashcards_window, easy_button, good_button, hard_button
     learn_flashcards_window = tk.Toplevel(root)
     learn_flashcards_window.title("Learn Flashcards")
@@ -224,18 +238,22 @@ def flip_flashcard():
     show_rating_buttons()
 
 def rate_flashcard(rating): # rating is either "Good", "Easy" or "Hard" depending on what the user chose.
-    global nextIndex, reviewFlashcards
+    global nextIndex, reviewFlashcards, flashcardsLearnt, good, easy, hard
     time = current_flashcard["time"]
     cardFactor = current_flashcard["cardFactor"]
+    flashcardsLearnt += 1
 
     if rating == "Easy": # if they found it easy
         current_flashcard["time"] += cardFactor * easyFactor
         current_flashcard["cardFactor"] += easyIncrement
+        easy += 1
     elif rating == "Good": # if they found it Good
         current_flashcard["time"] += cardFactor * goodFactor
         current_flashcard["cardFactor"] += goodIncrement
+        good += 1
     elif rating == "Hard": # if they found it hard
         current_flashcard["time"] += cardFactor * hardFactor
+        hard += 1
         if current_flashcard["cardFactor"] == 0: # This if statement makes sure the flashcard doesn't have a negative factor
             pass
         else:
@@ -249,6 +267,7 @@ def rate_flashcard(rating): # rating is either "Good", "Easy" or "Hard" dependin
     except:
         tk.messagebox.showerror("Error", "All due flashcards have been reviewed.")
         learn_flashcards_window.destroy()
+        stopTime()
 
 def select_deck(deck_name):
     global current_deck_flashcards, nextIndex, current_flashcard_side, reviewFlashcards
@@ -304,7 +323,7 @@ def open_settings():
     # the line above: after pressing the toggle theme button this command is what changes the theme.
     button.grid(row=1, column=0)
 
-def help():
+def helpW():
     window = tk.Toplevel(root) # creates a new menu
     window.title("Information")
     window.geometry("300x300")
@@ -318,13 +337,40 @@ def help():
     helpT = ttk.Label(window, text="Start by creating a deck by clicking New Deck in the main menu. You can then name your deck, add flashcards using the button in the menu and then review them using the review flashcards button also in the main menu.")
     helpT.config(wraplength=250)
     helpT.pack()
-    
+
+def statistics():
+    global elapsedTime
+    window = tk.Toplevel(root)
+    window.title("Statistics")
+    window.grid_rowconfigure(0, weight=1)  
+    window.grid_columnconfigure(0, weight=1)  
+
+    title = tk.Label(window, text="Statistics", font=('Arial', 16, 'bold'))
+    title.grid(row=0, column=0, pady=10)
+
+    stats = [
+        ("Easy Flashcards Done:", easy),
+        ("Good Flashcards Done:", good),
+        ("Hard Flashcards Done:", hard),
+        ("Total Flashcards Done:", flashcardsLearnt),
+        ("Time Spent (minutes):", elapsedTime)
+    ]
+
+    for i, (label_text, value) in enumerate(stats, start=1):
+        window.grid_rowconfigure(i, weight=1)
+        label = tk.Label(window, text=label_text, font=('Helvetica', 12))
+        value_label = tk.Label(window, text=value, font=('Helvetica', 12))
+        label.grid(row=i, column=0, sticky='w')
+        value_label.grid(row=i, column=1, sticky='e')
+
 toolbar_frame = tk.Frame(root)
 toolbar_frame.grid(row=0, column=0, columnspan=3, sticky="ew")
 settings_button = ttk.Button(toolbar_frame, text="Settings", command=open_settings)
 settings_button.grid(row=0, column=2, padx=10, pady=5)
-help_button = ttk.Button(toolbar_frame, text="Help and Info", command=help)
+help_button = ttk.Button(toolbar_frame, text="Help and Info", command=helpW)
 help_button.grid(row=0, column=3, padx=10, pady=5)
+statistics = ttk.Button(toolbar_frame, text="Statistics", command=statistics)
+statistics.grid(row=0, column=4, padx=10, pady=5)
 sv_ttk.set_theme("dark")
 #This is the code for the toolbar where the button is
 
