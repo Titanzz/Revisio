@@ -178,6 +178,7 @@ def rate_flashcard(rating):
     current_flashcard_index += 1
     if current_flashcard_index < len(current_deck_flashcards):
         display_flashcard()
+        flip_flashcard()
         hide_rating_buttons()
     else:
         learn_flashcards_window.destroy()
