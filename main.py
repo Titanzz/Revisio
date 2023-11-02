@@ -10,6 +10,8 @@ hardFactor = 1.0
 easyIncrement = 2
 goodIncrement = 1
 hardIncrement = -1
+
+#setting base values for the algorithm to use
         
 def close(window):
     window.destroy()
@@ -44,14 +46,14 @@ def add_flashcard():
 def viewDecks():
     decks_window = tk.Toplevel()
     decks_window.title("Decks")
-
     tk.Label(decks_window, text="All Decks", font=('Arial', 16, 'bold')).grid(row=0, column=0, columnspan=3)
-
     decks_window.columnconfigure(0, weight=1)
     decks_window.columnconfigure(1, weight=1)
     decks_window.columnconfigure(2, weight=1)
+    #basic settings for the viewDecks menu, weighting is implemented to make sure the window scales
 
-    def delete_deck(deck_name):
+
+    def delete_deck(deck_name): # If the user wants to delete the deck
         if deck_name in flashcards_dict:
             #print(decks)
             del flashcards_dict[deck_name]
@@ -60,12 +62,12 @@ def viewDecks():
             decks_window.destroy()
             viewDecks()
 
-    for i, deck_name in enumerate(flashcards_dict, start=1):
+    for i, deck_name in enumerate(flashcards_dict, start=1): #for loops lists all the decks
         tk.Label(decks_window, text=deck_name).grid(row=i, column=0, padx=5, pady=5, sticky='w')
         tk.Button(decks_window, text="View Flashcards", command=lambda name=deck_name: view_flashcards(name)).grid(row=i, column=2, padx=5, pady=5)
         tk.Button(decks_window, text="Delete Deck", command=lambda name=deck_name: delete_deck(name)).grid(row=i, column=1, padx=5, pady=5)
 
-    for i in range(1, len(flashcards_dict) + 1):
+    for i in range(1, len(flashcards_dict) + 1): #for loops adds weightings to all the decks shown in the menu 
         decks_window.rowconfigure(i, weight=1)
 
 def view_flashcards(deck_name):
@@ -77,23 +79,23 @@ def view_flashcards(deck_name):
     flashcards_window.columnconfigure(0, weight=1)
     flashcards_window.rowconfigure(0, weight=1)
 
-    def delete_flashcard(flashcard, frame):
+    def delete_flashcard(flashcard, frame): #function that deletes a flashcard if clicked.
         flashcards_dict[deck_name].remove(flashcard)
         frame.destroy()
 
-    for i, flashcard in enumerate(flashcards_dict[deck_name], start=1):
+    for i, flashcard in enumerate(flashcards_dict[deck_name], start=1): #loops through all the cards
         front = flashcard['front']
         back = flashcard['back']
-        flashcard_frame = tk.Frame(flashcards_window)
-        flashcard_frame.grid(row=i, column=0, padx=10, pady=5, sticky='nsew')
+        flashcardFrame = tk.Frame(flashcards_window) #frame to organise the flashcard front and back
+        flashcardFrame.grid(row=i, column=0, padx=10, pady=5, sticky='nsew')
 
-        flashcard_frame.columnconfigure(0, weight=1)
-        flashcard_frame.columnconfigure(1, weight=1)
-        flashcard_frame.columnconfigure(2, weight=1)
+        flashcardFrame.columnconfigure(0, weight=1)
+        flashcardFrame.columnconfigure(1, weight=1)
+        flashcardFrame.columnconfigure(2, weight=1)
 
-        tk.Label(flashcard_frame, text=f'Front: {front}').grid(row=0, column=0, padx=5, pady=1, sticky='nsew')
-        tk.Label(flashcard_frame, text=f'Back: {back}').grid(row=0, column=1, padx=5, pady=1, sticky='nsew')
-        delete_button = tk.Button(flashcard_frame, text="Delete", command=lambda card=flashcard, frame=flashcard_frame: delete_flashcard(card, frame))
+        tk.Label(flashcardFrame, text=f'Front: {front}').grid(row=0, column=0, padx=5, pady=1, sticky='nsew')
+        tk.Label(flashcardFrame, text=f'Back: {back}').grid(row=0, column=1, padx=5, pady=1, sticky='nsew')
+        delete_button = tk.Button(flashcardFrame, text="Delete", command=lambda card=flashcard, frame=flashcardFrame: delete_flashcard(card, frame))
         delete_button.grid(row=0, column=2, padx=5, pady=1, sticky='nsew')
 
     flashcards_window.grid_rowconfigure(i+1, weight=1)
@@ -187,29 +189,23 @@ def flip_flashcard():
     display_flashcard()
     show_rating_buttons()
 
-def rate_flashcard(rating):
+def rate_flashcard(rating): # rating is either "Good", "Easy" or "Hard" depending on what the user chose.
     global nextIndex, reviewFlashcards
     time = current_flashcard["time"]
-    originalFactor = current_flashcard["cardFactor"]
+    cardFactor = current_flashcard["cardFactor"]
 
-    if rating == "Easy":
-        current_flashcard["time"] += originalFactor * easyFactor
+    if rating == "Easy": # if they found it easy
+        current_flashcard["time"] += cardFactor * easyFactor
         current_flashcard["cardFactor"] += easyIncrement
-        print(current_flashcard["cardFactor"])
-        print(current_flashcard["time"])
-    elif rating == "Good":
-        current_flashcard["time"] += originalFactor * goodFactor
+    elif rating == "Good": # if they found it Good
+        current_flashcard["time"] += cardFactor * goodFactor
         current_flashcard["cardFactor"] += goodIncrement
-        print(current_flashcard["cardFactor"])
-        print(current_flashcard["time"])
-    elif rating == "Hard":
-        current_flashcard["time"] += originalFactor * hardFactor
-        if current_flashcard["cardFactor"] == 0:
+    elif rating == "Hard": # if they found it hard
+        current_flashcard["time"] += cardFactor * hardFactor
+        if current_flashcard["cardFactor"] == 0: # This if statement makes sure the flashcard doesn't have a negative factor
             pass
         else:
             current_flashcard["cardFactor"] += hardIncrement
-        print(current_flashcard["cardFactor"])
-        print(current_flashcard["time"])
     try:
         nextIndex = reviewFlashcards[0]
         reviewFlashcards.pop(0)
@@ -228,7 +224,6 @@ def select_deck(deck_name):
     for i, flashcard in enumerate(current_deck_flashcards):
         if flashcard.get("time", 0) == 0:
             reviewFlashcards.append(i)
-    print(reviewFlashcards)
     try:
         nextIndex = reviewFlashcards[0]
         reviewFlashcards.pop(0)
@@ -274,11 +269,28 @@ def open_settings():
     button = ttk.Button(settings_window, text="Toggle theme", command=sv_ttk.toggle_theme)
     # the line above: after pressing the toggle theme button this command is what changes the theme.
     button.grid(row=1, column=0)
+
+def help():
+    window = tk.Toplevel(root) # creates a new menu
+    window.title("Information")
+    window.geometry("300x300")
+    infoHeading = ttk.Label(window, text="Information", font=("Arial", 14, "bold"))
+    infoHeading.pack(pady=10)
+    info = ttk.Label(window, text="This app is intended to help students revise effectively by creating and reviewing flashcards under a spaced repetition algorithm that helps manage when flashcards should be reviewed. ")
+    info.config(wraplength=250)
+    info.pack()
+    helpHeading = ttk.Label(window, text="Help", font=("Arial", 14, "bold"))
+    helpHeading.pack(pady=10)
+    helpT = ttk.Label(window, text="Start by creating a deck by clicking New Deck in the main menu. You can then name your deck, add flashcards using the button in the menu and then review them using the review flashcards button also in the main menu.")
+    helpT.config(wraplength=250)
+    helpT.pack()
     
 toolbar_frame = tk.Frame(root)
 toolbar_frame.grid(row=0, column=0, columnspan=3, sticky="ew")
 settings_button = ttk.Button(toolbar_frame, text="Settings", command=open_settings)
 settings_button.grid(row=0, column=2, padx=10, pady=5)
+help_button = ttk.Button(toolbar_frame, text="Help and Info", command=help)
+help_button.grid(row=0, column=3, padx=10, pady=5)
 sv_ttk.set_theme("dark")
 #This is the code for the toolbar where the button is
 
