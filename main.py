@@ -247,10 +247,14 @@ def rate_flashcard(rating): # rating is either "Good", "Easy" or "Hard" dependin
         current_flashcard["time"] += cardFactor * easyFactor
         current_flashcard["cardFactor"] += easyIncrement
         easy += 1
+        print(current_flashcard["cardFactor"])
+        print(current_flashcard["time"])
     elif rating == "Good": # if they found it Good
         current_flashcard["time"] += cardFactor * goodFactor
         current_flashcard["cardFactor"] += goodIncrement
         good += 1
+        print(current_flashcard["cardFactor"])
+        print(current_flashcard["time"])
     elif rating == "Hard": # if they found it hard
         current_flashcard["time"] += cardFactor * hardFactor
         hard += 1
@@ -258,6 +262,8 @@ def rate_flashcard(rating): # rating is either "Good", "Easy" or "Hard" dependin
             pass
         else:
             current_flashcard["cardFactor"] += hardIncrement
+        print(current_flashcard["cardFactor"])
+        print(current_flashcard["time"])
     try:
         nextIndex = reviewFlashcards[0]
         reviewFlashcards.pop(0)
@@ -312,6 +318,44 @@ root.columnconfigure(0, weight=1)
 root.columnconfigure(1, weight=1)
 root.columnconfigure(2, weight=1)
 
+
+
+def algorithm_changer():
+    def valChanger(inp):
+        global easyFactor, goodFactor, hardFactor
+        if inp == "easy":
+            easyFactor = int(easyInput.get())
+        elif inp == "good":
+            goodFactor = int(goodInput.get())
+        elif inp == "hard":
+            hardFactor = int(hardInput.get())
+
+    window = tk.Toplevel(root)
+    window.title("Algorithm editor")
+    window.rowconfigure(0, weight=1)
+    window.rowconfigure(1, weight=1)
+    window.rowconfigure(2, weight=1)
+    window.rowconfigure(3, weight=1)
+    window.columnconfigure(0, weight=1)
+
+    ttk.Label(window, text="Easy Factor:").grid(row=0, column=0, padx=10, pady=5, sticky='w')
+    ttk.Label(window, text="Good Factor:").grid(row=1, column=0, padx=10, pady=5, sticky='w')
+    ttk.Label(window, text="Hard Factor:").grid(row=2, column=0, padx=10, pady=5, sticky='w')
+    ttk.Label(window, text="Original values are 3, 1.5, 1 respectively").grid(row=3, column=0, padx=10, pady=5)
+    easyInput = tk.Entry(window)
+    goodInput = tk.Entry(window)
+    hardInput = tk.Entry(window)
+    eButton = tk.Button(window, text="Change",command=lambda input="easy": valChanger(input))
+    gButton = tk.Button(window, text="Change",command=lambda input="good": valChanger(input))
+    hButton = tk.Button(window, text="Change",command=lambda input="hard": valChanger(input))
+
+    eButton.grid(row=0, column=2, padx=10, pady=5, sticky='w')
+    gButton.grid(row=1, column=2, padx=10, pady=5, sticky='w')
+    hButton.grid(row=2, column=2, padx=10, pady=5, sticky='w')
+    easyInput.grid(row=0, column=1, padx=10, pady=5)
+    goodInput.grid(row=1, column=1, padx=10, pady=5)
+    hardInput.grid(row=2, column=1, padx=10, pady=5)
+
 def open_settings():
     settings_window = tk.Toplevel(root) # creates a new menu
     settings_window.title("Settings")
@@ -320,8 +364,11 @@ def open_settings():
     settings_window.rowconfigure(0, weight=1)
     settings_window.rowconfigure(1, weight=1)
     button = ttk.Button(settings_window, text="Toggle theme", command=sv_ttk.toggle_theme)
-    # the line above: after pressing the toggle theme button this command is what changes the theme.
     button.grid(row=1, column=0)
+    # the line above: after pressing the toggle theme button this command is what changes the theme.
+    algorithmB = ttk.Button(settings_window, text="Change algorithm settings", command=algorithm_changer)
+    algorithmB.grid(row=0, column=0)
+    
 
 def helpW():
     window = tk.Toplevel(root) # creates a new menu
