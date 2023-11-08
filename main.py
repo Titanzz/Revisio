@@ -395,13 +395,23 @@ def statistics():
     title = tk.Label(window, text="Statistics", font=('Arial', 16, 'bold'))
     title.grid(row=0, column=0, pady=10)
 
-    stats = [
-        ("Easy Flashcards Done:", easy),
-        ("Good Flashcards Done:", good),
-        ("Hard Flashcards Done:", hard),
-        ("Total Flashcards Done:", flashcardsLearnt),
-        ("Time Spent (minutes):", elapsedTime)
-    ]
+    try:
+        if elapsedTime != 0:
+            stats = [
+                ("Easy Flashcards Done:", easy),
+                ("Good Flashcards Done:", good),
+                ("Hard Flashcards Done:", hard),
+                ("Total Flashcards Done:", flashcardsLearnt),
+                ("Time Spent (minutes):", elapsedTime)
+            ]
+    except:
+        stats = [
+            ("Easy Flashcards Done:", easy),
+            ("Good Flashcards Done:", good),
+            ("Hard Flashcards Done:", hard),
+            ("Total Flashcards Done:", flashcardsLearnt),
+            ("Time Spent (minutes):", "No Time spent")
+        ]
 
     for i, (label_text, value) in enumerate(stats, start=1):
         window.grid_rowconfigure(i, weight=1)
