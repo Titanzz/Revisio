@@ -1,2 +1,8 @@
 # Revisio
-Anki clone project using python tkinter
+Anki clone project 
+
+# Libraries used
+- Tkinter
+- sv_ttk
+
+#
