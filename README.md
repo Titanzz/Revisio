@@ -1,6 +1,7 @@
 # Revisio
 Python program that allows you to create and revise flashcards. 
-![image](https://github.com/user-attachments/assets/edff8de3-984b-47c9-8599-ba35c3f1a694)
+![image](https://github.com/user-attachments/assets/457bbeb6-a69a-4567-a4aa-1b5e83b5e52a)
+
 
 
 # Libraries used
