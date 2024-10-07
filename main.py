@@ -18,8 +18,17 @@ easy = 0
 good = 0
 hard = 0
 
+date_format = "%Y-%m-%d %H:%M:%S.%f"
+
+def timeCheck():
+    for i, deck in enumerate(flashcards_dict, start=1):
+        for i, flashcard in enumerate(flashcards_dict[deck], start=1):
+            reviewD = datetime.strptime(flashcard["reviewDate"], date_format)
+            if datetime.now() >= reviewD:
+                flashcard["time"] = 0
+
 #setting base values for the algorithm to use
-        
+
 def close(window):
     window.destroy()
 
@@ -441,6 +450,7 @@ try:
     file.close()
 except:
     pass
+timeCheck()
 #json is used to handle saving and downloading the flashcards.
 
 deckTitle = tk.Label(root,text = "Revisio",font=('Nexa', 40))
