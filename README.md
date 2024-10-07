@@ -10,4 +10,6 @@
 - Tkinter
 - sv_ttk
 
-#
+# Things to do 
+- Show the date reviewed and the time reviewed.
+- Maybe add automatic check for when cards are ready to be reviewed
