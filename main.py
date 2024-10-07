@@ -4,6 +4,7 @@ from tkinter import simpledialog
 import sv_ttk
 import json
 import time
+from datetime import datetime, timedelta
 
 easyFactor = 3.0
 goodFactor = 1.5
@@ -58,7 +59,7 @@ def add_flashcard():
     else:
         if selected_deck not in flashcards_dict:
             flashcards_dict[selected_deck] = []
-        flashcards_dict[selected_deck].append({"front": front_text.rstrip(), "back": back_text.rstrip(), "time": 0, "cardFactor": 1})
+        flashcards_dict[selected_deck].append({"front": front_text.rstrip(), "back": back_text.rstrip(), "time": 0, "cardFactor": 1, "reviewDate":"non"})
         #print(flashcards_dict)    
         
 def viewDecks():
@@ -246,24 +247,21 @@ def rate_flashcard(rating): # rating is either "Good", "Easy" or "Hard" dependin
     if rating == "Easy": # if they found it easy
         current_flashcard["time"] += cardFactor * easyFactor
         current_flashcard["cardFactor"] += easyIncrement
+        current_flashcard["reviewDate"] = str(datetime.now() + timedelta(days=current_flashcard["time"]))
         easy += 1
-        print(current_flashcard["cardFactor"])
-        print(current_flashcard["time"])
     elif rating == "Good": # if they found it Good
         current_flashcard["time"] += cardFactor * goodFactor
         current_flashcard["cardFactor"] += goodIncrement
+        current_flashcard["reviewDate"] = str(datetime.now() + timedelta(days=current_flashcard["time"]))
         good += 1
-        print(current_flashcard["cardFactor"])
-        print(current_flashcard["time"])
     elif rating == "Hard": # if they found it hard
         current_flashcard["time"] += cardFactor * hardFactor
         hard += 1
+        current_flashcard["reviewDate"] = str(datetime.now() + timedelta(days=current_flashcard["time"]))
         if current_flashcard["cardFactor"] == 0: # This if statement makes sure the flashcard doesn't have a negative factor
             pass
         else:
             current_flashcard["cardFactor"] += hardIncrement
-        print(current_flashcard["cardFactor"])
-        print(current_flashcard["time"])
     try:
         nextIndex = reviewFlashcards[0]
         reviewFlashcards.pop(0)
