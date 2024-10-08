@@ -1,3 +1,7 @@
 
 decks
 flashcards
+build/main/Analysis-00.toc
+/build
+/dist
+*.spec
